@@ -26,6 +26,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/taskq/v3"
 	"github.com/vmihailenco/taskq/v3/memqueue"
+	"github.com/layer5io/meshery/mesheryctl/pkg/utils"
+
 )
 
 var (
@@ -47,7 +49,7 @@ func main() {
 
 	instanceID, err := uuid.NewV4()
 	if err != nil {
-		logrus.Error(err)
+		utils.Log.Error(err)
 		os.Exit(1)
 	}
 
@@ -56,13 +58,13 @@ func main() {
 		Format: logger.SyslogLogFormat,
 	})
 	if err != nil {
-		logrus.Error(err)
+		utils.Log.Error(err)
 		os.Exit(1)
 	}
 
 	// operatingSystem, err := exec.Command("uname", "-s").Output()
 	// if err != nil {
-	// 	logrus.Error(err)
+	// 	utils.Log.Error(err)
 	// }
 
 	ctx := context.Background()
@@ -83,15 +85,15 @@ func main() {
 
 	// Register local OAM traits and workloads
 	if err := core.RegisterMesheryOAMTraits(); err != nil {
-		logrus.Error(err)
+		utils.Log.Error(err)
 	}
 	if err := core.RegisterMesheryOAMWorkloads(); err != nil {
-		logrus.Error(err)
+		utils.Log.Error(err)
 	}
-	logrus.Info("Local Provider capabilities are: ", version)
+	utils.Log.Info("Local Provider capabilities are: ", version)
 
 	// Get the channel
-	logrus.Info("Meshery Server release channel is: ", releasechannel)
+	utils.Log.Info("Meshery Server release channel is: ", releasechannel)
 
 	home, err := os.UserHomeDir()
 	if viper.GetString("USER_DATA_FOLDER") == "" {
@@ -269,17 +271,17 @@ func main() {
 		}
 	}()
 	<-c
-	logrus.Info("Doing seeded content cleanup...")
+	utils.Log.Info("Doing seeded content cleanup...")
 	err = lProv.Cleanup()
 	if err != nil {
 		log.Error(err)
 	}
 
-	logrus.Info("Closing database instance...")
+	utils.Log.Info("Closing database instance...")
 	err = dbHandler.DBClose()
 	if err != nil {
 		log.Error(err)
 	}
 
-	logrus.Info("Shutting down Meshery Server...")
+	utils.Log.Info("Shutting down Meshery Server...")
 }
